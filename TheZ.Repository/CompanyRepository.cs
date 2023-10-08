@@ -14,7 +14,11 @@ namespace TheZ.Repository
         {
         }
 
-        public IEnumerable<Company> GetAllCompanies(bool trackChange) =>
-            FindAll(trackChange).OrderBy(c=>c.Name).ToList();
+        public IEnumerable<Company> GetAllCompanies(bool trackChange)
+        {
+            throw new Exception("Exception");
+            return FindAll(trackChange).OrderBy(c => c.Name).ToList();
+        }
+        
     }
 }

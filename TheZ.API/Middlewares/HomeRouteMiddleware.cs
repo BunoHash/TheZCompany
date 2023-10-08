@@ -17,16 +17,4 @@ namespace TheZ.API.Middlewares
             await _next.Invoke(context);
         }
     }
-
-    public static class HomeRouteMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseHomePathMiddleware(this IApplicationBuilder appBuilder)
-        {
-            appBuilder.Map("/home", b => {
-                b.UseMiddleware<HomeRouteMiddleware>();
-            });
-            return appBuilder;
-        }
-
-    }
 }

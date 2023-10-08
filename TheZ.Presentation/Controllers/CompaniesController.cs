@@ -18,16 +18,9 @@ namespace TheZ.Presentation.Controllers
         [HttpGet]
         public IActionResult GetCompanies()
         {
-            try
-            {
-                var companies = _serviceManager.CompanyService.GetAllCompanies(false);
-                return Ok(companies);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error");
-            }
+            
+            var companies = _serviceManager.CompanyService.GetAllCompanies(false);
+            return Ok(companies);
         }
     }
 }

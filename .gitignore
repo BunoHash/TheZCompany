@@ -75,3 +75,4 @@ TheZ.Entities/bin/*
 CompanyEmployees.Presentation/obj/*
 TheZ.Presentation/bin/*
 TheZ.API/Migrations/*
+TheZ.API/internal_logs/internallog.txt

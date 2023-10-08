@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using TheZ.API.Extensions;
 using TheZ.API.Middlewares;
-
+using TheZ.Contracts.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +16,15 @@ builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddControllers()
-    .AddApplicationPart(typeof(TheZ.Presentation.AssemblyReference).Assembly);
+builder.Services.AddControllers().AddApplicationPart(typeof(TheZ.Presentation.AssemblyReference).Assembly);
 
 var app = builder.Build();
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionhandler(logger);
 
 // Configure the HTTP request pipeline.
 
-if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
+if (app.Environment.IsDevelopment());
 else app.UseHsts();
 
 app.UseHttpsRedirection();
@@ -34,33 +35,28 @@ app.UseAuthorization();
 
 
 
-// Some custom Middlewares examples
-
-//app.Use( async (context, next) => {
-//    Console.WriteLine("Logic Before execution the next middleware");
-//    context.Response.StatusCode = 200; // Status code can be set before you start send/writing response
-//    await next.Invoke();
-//    Console.WriteLine("Logic After execution the next middleware");
-//});
-
-
-//app.MapWhen(context => context.Request.Query.ContainsKey("sales"), builder =>
-//{
-//    builder.Use(async (context, next) =>
-//    {
-//        Console.WriteLine("Map branch logic in the Use method before the next delegate");
-//        await next.Invoke();
-//        Console.WriteLine("Map branch logic in the Use method after the next delegate");
-//    });
-
-//    //builder.Run(async context =>
-//    //{
-//    //    await context.Response.WriteAsync("test with MapWhen");
-
-//    //});
-//});
+// Some custom Inline & extension Middlewares examples
+// Map and MapWhen are terminal middleware, Even if you don't use the RUN method they will not invoke the next one
+// Sample URL: https://localhost:5001/products?log=yes&sales=90
 
 app.UseLogTestMiddleware();
+app.UseMiddleware<HomeRouteMiddleware>();
+
+app.MapWhen(context => context.Request.Query.ContainsKey("sales"), builder =>
+{
+    builder.Use(async (context, next) =>
+    {
+        Console.WriteLine("Map branch logic in the Use method before the next delegate");
+        await next.Invoke();
+        Console.WriteLine("Map branch logic in the Use method after the next delegate");
+    });
+
+    //builder.Run(async context =>
+    //{
+    //    await context.Response.WriteAsync("test with MapWhen");
+
+    //});
+});
 
 
 app.Map("/products", builder => {
@@ -77,8 +73,6 @@ app.Map("/products", builder => {
         await context.Response.WriteAsync("Hello from the products map branch.");
     });
 });
-
-app.UseHomePathMiddleware();
 
 
 

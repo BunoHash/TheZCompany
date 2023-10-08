@@ -28,17 +28,9 @@ namespace TheZ.Service
 
         public IEnumerable<CompanyDto>GetAllCompanies(bool trackChange)
         {
-            try
-            {
-                var companies = _repository.Company.GetAllCompanies(trackChange);
-                var companyDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
-                return companyDto;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in {nameof(GetAllCompanies)} : " + ex.Message);
-                throw;
-            }
+            var companies = _repository.Company.GetAllCompanies(trackChange);
+            var companyDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+            return companyDto;
         }
     }
 }

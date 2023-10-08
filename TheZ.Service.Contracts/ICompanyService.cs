@@ -12,6 +12,7 @@ namespace TheZ.Service.Contracts
     public interface ICompanyService
     {
         IEnumerable<CompanyDto> GetAllCompanies(bool trackChange);
+        CompanyDto GetCompany(Guid companyId, bool trackChanges);
 
     }
 }

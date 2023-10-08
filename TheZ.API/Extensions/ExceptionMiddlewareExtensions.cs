@@ -2,6 +2,7 @@
 using System.Net;
 using TheZ.Contracts.Interfaces;
 using TheZ.Entities;
+using TheZ.Entities.Exceptions;
 
 namespace TheZ.API.Extensions
 {
@@ -13,16 +14,21 @@ namespace TheZ.API.Extensions
             {
                 appError.Run(async context =>
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.ContentType = "application/json";
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
+                        context.Response.StatusCode = contextFeature.Error switch
+                        {
+                            NotFoundException => StatusCodes.Status404NotFound,
+                            _ => StatusCodes.Status500InternalServerError
+                        };
+
                         logger.LogError($"Something went wrong: {contextFeature.Error}");
                         await context.Response.WriteAsync(new ErrorDetails()
                         {
                             StatusCode = context.Response.StatusCode,
-                            Message = "Internal Server Error.",
+                            Message = contextFeature.Error.Message,
                         }.ToString());
                     }
                 });
